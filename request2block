@@ -13,6 +13,7 @@ program
   .version('0.0.1', '-v, --version')
   .option('-u, --url <url>', 'url to be tested')
   .option('-t, --throttle [n]', 'how many request per second, default is 10', parseInt)
+  .option('-r, --requests [n]', 'how many total requests, default is 10000', parseInt)
   .parse(process.argv);
 
 const urlRegex = new RegExp(/^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)$/);
@@ -24,28 +25,30 @@ if(typeof program.url === 'undefined' || !program.url.match(urlRegex)) {
   const url = program.url;
   let throttle = 10; // default to 10 req/s
   let requestNumber = 0;
+  let totalRequests = 10000;
 
-  if(typeof program.throttle !== 'undefined') {
+  if(typeof program.throttle !== 'undefined')
     throttle = program.throttle;
-  }
+
+  if(typeof program.requests !== 'undefined')
+    totalRequests = program.requests;
 
   throttledRequest.configure({
     requests: throttle,
     milliseconds: 1000
   });
 
-  for(var i = 0; i < 100000; i++) {
+  for(let i = 0; i < totalRequests; i++) {
     throttledRequest(url)
       .on('response', function (response) {
         if(response.statusCode) {
-          requestNumber++;
-          console.log(`Request number: ${requestNumber}`);
+          console.log(`Request number: ${requestNumber++}`);
+          if(i === totalRequests - 1)
+            console.log('This site is probably not blocking ips!'.green.bold);
         } else {
           console.log(`\n\n${requestNumber} requests before being blocked`.green.bold);
           process.exit();
         }
       });
   }
-
-  console.log('This site is probably not blocking ips!'.green.bold);
 }
