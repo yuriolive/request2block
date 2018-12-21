@@ -1,0 +1,51 @@
+#!/usr/bin/env node
+
+/**
+ * Module dependencies.
+ */
+
+const request = require('request');
+const throttledRequest = require('throttled-request')(request);
+const colors = require('colors');
+let program = require('commander');
+
+program
+  .version('0.0.1', '-v, --version')
+  .option('-u, --url <url>', 'url to be tested')
+  .option('-t, --throttle [n]', 'how many request per second, default is 10', parseInt)
+  .parse(process.argv);
+
+const urlRegex = new RegExp(/^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)$/);
+
+if(typeof program.url === 'undefined' || !program.url.match(urlRegex)) {
+  console.error('You should use a valid url!\n'.red);
+  program.help();
+} else {
+  const url = program.url;
+  let throttle = 10; // default to 10 req/s
+  let requestNumber = 0;
+
+  if(typeof program.throttle !== 'undefined') {
+    throttle = program.throttle;
+  }
+
+  throttledRequest.configure({
+    requests: throttle,
+    milliseconds: 1000
+  });
+
+  for(var i = 0; i < 100000; i++) {
+    throttledRequest(url)
+      .on('response', function (response) {
+        if(response.statusCode) {
+          requestNumber++;
+          console.log(`Request number: ${requestNumber}`);
+        } else {
+          console.log(`\n\n${requestNumber} requests before being blocked`.green.bold);
+          process.exit();
+        }
+      });
+  }
+
+  console.log('This site is probably not blocking ips!'.green.bold);
+}
