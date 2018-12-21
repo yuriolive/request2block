@@ -41,7 +41,9 @@ if(typeof program.url === 'undefined' || !program.url.match(urlRegex)) {
   for(let i = 0; i < totalRequests; i++) {
     throttledRequest(url)
       .on('response', function (response) {
-        if(response.statusCode === '200') {
+        console.log(response.statusCode);
+
+        if(response.statusCode === 200) {
           console.log(`Request number: ${requestNumber++}`);
           if(i === totalRequests - 1)
             console.log('This site is probably not blocking ips!'.green.bold);
