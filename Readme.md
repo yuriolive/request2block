@@ -19,7 +19,7 @@ To see all the options you can run:
 	
 	./request2block -h
 
-THis will return:
+This will return:
 
 	Usage: request2block [options]
 
