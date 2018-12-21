@@ -14,3 +14,17 @@ Then you can run in terminal:
 	./request2block -u https://www.example.com -t 5
 
 This will run for the website https://wwww.example.com and throttle to 5 requests per second.
+
+To see all the options you can run:
+	
+	./request2block -h
+
+THis will return:
+
+	Usage: request2block [options]
+
+	Options:
+	  -v, --version       output the version number
+	  -u, --url <url>     url to be tested
+	  -t, --throttle [n]  how many request per second, default is 10
+	  -h, --help          output usage information
